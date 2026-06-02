@@ -14,7 +14,7 @@ class OllamaController extends Controller
      */
     public function generate(Request $request)
     {
-        $data = Http::withToken(config('ollama.api.key'))
+        $response = Http::withToken(config('ollama.api.key'))
                     ->post('https://ollama.com/api/generate', [
                         "model" => "minimax-m3:cloud",
                         "prompt" => $request->prompt,
@@ -22,11 +22,13 @@ class OllamaController extends Controller
                     ])
                     ->json();
 
-        return $data['response'];
+        return $response['response'];
     }
 
     /**
-     * Generate an AI response from the provided prompt using the Ollama API.
+     * Send a prompt to the Ollama chat API and return the complete AI-generated response.
+     *
+     * Parses the streamed NDJSON response and merges all content chunks into a single string.
      */
     public function chat(Request $request)
     {
