@@ -30,7 +30,7 @@ class OllamaController extends Controller
      */
     public function store(Request $request)
     {
-        $data = Http::withToken('seu_token')
+        $data = Http::withToken(config('ollama.api.key'))
             ->post('https://ollama.com/api/generate', [
                 "model" => "minimax-m3:cloud",
                 "prompt" => $request->prompt,
