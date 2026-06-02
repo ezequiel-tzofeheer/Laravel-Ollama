@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Http;
 class OllamaController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Generate an AI response from the provided prompt using the Ollama API.
      */
     public function generate(Request $request)
     {
