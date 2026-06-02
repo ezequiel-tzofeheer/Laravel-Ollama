@@ -3,6 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// API V1
+use App\Http\Controllers\Api\V1\{
+    Ollama\OllamaController,
+};
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -13,3 +18,6 @@ Route::get('/', function () {
         'success'   => true,
     ], 200);
 });
+
+// Ollama
+Route::apiResource('ollama', OllamaController::class);
