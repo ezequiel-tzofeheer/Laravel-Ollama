@@ -21,3 +21,4 @@ Route::get('/', function () {
 
 // Ollama
 Route::post('ollama/generate', [OllamaController::class, 'generate']); // Generate
+Route::post('ollama/chat', [OllamaController::class, 'chat']); // Chat
