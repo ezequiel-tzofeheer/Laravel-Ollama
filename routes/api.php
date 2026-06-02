@@ -4,8 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // API V1
-use App\Http\Controllers\Api\V1\{
-    Ollama\OllamaController,
+use app\Http\Controllers\Api\V1\{
+    Ollama\Generate\OllamaGenerateController
 };
 
 Route::get('/user', function (Request $request) {
@@ -20,4 +20,4 @@ Route::get('/', function () {
 });
 
 // Ollama
-Route::apiResource('ollama', OllamaController::class);
+Route::post('ollama/generate', OllamaGenerateController::class); // Generate
