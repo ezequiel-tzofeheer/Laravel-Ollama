@@ -15,7 +15,7 @@ class OllamaController extends Controller
     public function generate(Request $request)
     {
         $response = Http::withToken(config('ollama.api.key'))
-                    ->post('https://ollama.com/api/generate', [
+                    ->post('http://host.docker.internal:11434/api/generate', [
                         "model" => "minimax-m3:cloud",
                         "prompt" => $request->prompt,
                         "stream" => false
