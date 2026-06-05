@@ -33,7 +33,7 @@ class OllamaController extends Controller
     public function chat(Request $request)
     {
         $response = Http::withToken(config('ollama.api.key'))
-                    ->post('https://ollama.com/api/chat', [
+                    ->post('http://host.docker.internal:11434/api/chat', [
                         "model" => "minimax-m3:cloud",
                         "messages" => [
                         [
