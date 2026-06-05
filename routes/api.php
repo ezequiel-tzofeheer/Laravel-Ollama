@@ -22,3 +22,5 @@ Route::get('/', function () {
 // Ollama
 Route::post('ollama/generate', [OllamaController::class, 'generate']); // Generate
 Route::post('ollama/chat', [OllamaController::class, 'chat']); // Chat
+Route::post('ollama/tool-calling', [OllamaController::class, 'toolCalling']); // Tool Calling
+Route::get('cnpj', [OllamaController::class, 'getCnpj']); // CNPJ
