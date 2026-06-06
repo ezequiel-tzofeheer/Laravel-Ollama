@@ -67,37 +67,37 @@ class OllamaController extends Controller
     public function toolCalling(Request $request)
     {
         $response = Http::withToken(config('ollama.api.key'))
-        ->post('http://host.docker.internal:11434/api/chat', [
-            "model" => "minimax-m3:cloud",
-            "messages" => [
-                [
-                    "role"      => "user",
-                    "content"   => $request->prompt
-                ]
-            ],
-            "stream" => false,
-            "tools" => [
-                [
-                    "type" => "function",
-                    "function" => [
-                        "name" => "get_cnpj",
-                        "description" => "Obtenha os dados de um CNPJ.",
-                        "parameters" => [
-                            "type" => "object",
-                            "required" => [
-                                "cnpj"
-                            ],
-                            "properties" => [
-                                "cnpj" => [
-                                    "type" => "string",
-                                    "description" => "Dados do CNPJ"
+            ->post('http://host.docker.internal:11434/api/chat', [
+                "model" => "minimax-m3:cloud",
+                "messages" => [
+                    [
+                        "role"      => "user",
+                        "content"   => $request->prompt
+                    ]
+                ],
+                "stream" => false,
+                "tools" => [
+                    [
+                        "type" => "function",
+                        "function" => [
+                            "name" => "get_cnpj",
+                            "description" => "Obtenha os dados de um CNPJ.",
+                            "parameters" => [
+                                "type" => "object",
+                                "required" => [
+                                    "cnpj"
+                                ],
+                                "properties" => [
+                                    "cnpj" => [
+                                        "type" => "string",
+                                        "description" => "Dados do CNPJ"
+                                    ]
                                 ]
                             ]
                         ]
                     ]
                 ]
-            ]
-        ]);
+            ]);
 
         $toolCalls = $response->json('message.tool_calls') ?? [];
 
@@ -108,13 +108,13 @@ class OllamaController extends Controller
 
             if ($functionName == 'get_cnpj') {
 
-                $cnpj = $arguments['cnpj'];
+                $cnpj = preg_replace('/\D/', '', $arguments['cnpj']);
                 $result = $this->getCnpj($cnpj);
 
                 $messages = [
                     [
                         "role"          => "system",
-                        "content"       => 'Você é um assistente e responde sempre em português do Brasil.'
+                        "content"       => 'Você é um assistente e responde sempre em português do Brasil. Você deve usar ferramentas sempre que necessário.'
                     ],
                     [
                         "role"          => "user",
@@ -143,9 +143,9 @@ class OllamaController extends Controller
 
                 return $finalResponse->json();
 
-            }
+            } // if
 
-        }
+        } // foreach
     }
 
     /**
@@ -156,13 +156,6 @@ class OllamaController extends Controller
      */
     public function getCnpj($cnpj)
     {
-        $response = Http::get("https://publica.cnpj.ws/cnpj/$cnpj")->json();
-
-        return [
-            'Razão Social'      => $response['razao_social'] ?? null,
-            'Capital Social'    => $response['capital_social'] ?? null,
-            'MEI'               => $response['simples']['mei'] ?? null,
-            'Simples Nacional'  => $response['simples']['simples'] ?? null,
-        ];
+        return $response = Http::get("https://publica.cnpj.ws/cnpj/$cnpj")->json();
     }
 }
