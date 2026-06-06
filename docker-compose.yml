@@ -1,0 +1,79 @@
+services:
+
+    # Image
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        working_dir: /var/www/
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - redis
+        networks:
+            - laravel-ollama
+
+    # NGINX
+    nginx:
+        image: nginx:alpine
+        restart: unless-stopped
+        ports:
+            - "8096:80"
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx/:/etc/nginx/conf.d/
+        networks:
+            - laravel-ollama
+
+    # DB (MySQL)
+    db:
+        image: mysql:8.0
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE:-laravel}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+            MYSQL_PASSWORD: ${DB_PASSWORD:-userpass}
+            MYSQL_USER: ${DB_USERNAME:-username}
+        volumes:
+            - ./.docker/mysql/dbdata:/var/lib/mysql
+        ports:
+            - "3446:3306"
+        networks:
+            - laravel-ollama
+
+    # PHPMyAdmin
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        restart: unless-stopped
+        ports:
+            - "8550:80"
+        environment:
+            PMA_HOST: db
+            PMA_PORT: 3306
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+        networks:
+            - laravel-ollama
+
+    queue:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      command: 'php artisan queue:work'
+      restart: unless-stopped
+      volumes:
+        - ./:/var/www
+      depends_on:
+        - redis
+      networks:
+        - laravel-ollama
+
+    # Redis
+    redis:
+        image: redis:latest
+        networks:
+            - laravel-ollama
+
+networks:
+    laravel-ollama:
+        driver: bridge
